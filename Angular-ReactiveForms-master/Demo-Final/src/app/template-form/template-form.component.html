@@ -1,0 +1,127 @@
+<h1>Template Driven Form</h1>
+<div class="card">
+  <div class="card-header">
+    Sign Up!
+  </div>
+
+  <div class="card-body">
+    <form (ngSubmit)="save()" #customerForm="ngForm">
+      <span>errors: {{ firstNameControl.errors | json }}</span>
+      <app-form-control-wrapper [label]="'First name'">
+        <app-td-text-input>
+          <input
+            #firstNameControl="ngModel"
+            class="form-control"
+            [ngClass]="firstNameControl.invalid ? 'invalid' : 'valid'"
+            id="firstNameId"
+            type="text"
+            minlength="3"
+            required
+            placeholder="First Name (required)"
+            name="firstName"
+            [(ngModel)]="viewModel.firstName"
+          />
+          <div *ngIf="firstNameControl.errors && firstNameControl.touched">
+            <div *ngIf="firstNameControl.errors.minlength">
+              length 3 required
+            </div>
+            <div *ngIf="firstNameControl.errors.required">
+              first name is required
+            </div>
+          </div>
+        </app-td-text-input>
+      </app-form-control-wrapper>
+      <app-form-control-wrapper [label]="'Business or Private'">
+        <div>
+          <ng-container *ngFor="let option of yesNoOptions; let i = index">
+            <label class="container"
+              >{{ option.label }}
+              <input
+                #notificationControl="ngModel"
+                type="radio"
+                [value]="option.value"
+                (click)="onSelect(option.value)"
+                name="notificationControl"
+                required
+                [attr.checked]="i === 0"
+                [(ngModel)]="viewModel.notificationControl"
+              />
+              <span class="checkmark"></span>
+            </label>
+        </ng-container>
+        <div *ngIf="customerForm.controls.notificationControl
+            && customerForm.controls.notificationControl.errors">
+            <div *ngIf="customerForm.controls.notificationControl.errors.required">
+                notification is required
+            </div>
+        </div>
+        </div>
+      </app-form-control-wrapper>
+      <app-form-control-wrapper [label]="'Type of business'">
+        <div>
+          <ng-container
+            *ngFor="let option of whatKindOfBusinessOptions; let i = index"
+          >
+            <label class="container"
+              >{{ option.label }}
+              <input
+                type="checkbox"
+                [value]="option.value"
+                (click)="onSelect($event)"
+                name="{{ option.label }}"
+                [(ngModel)]="viewModel.businessType[option.value]"
+              />
+            </label>
+          </ng-container>
+        </div>
+      </app-form-control-wrapper>
+      <button (click)="addDynamicField()">Add dynamic field</button>
+      <button (click)="removePerson()">Remove</button>
+      <fieldset *ngFor="let person of people; let i = index">
+        <div class="form-group row mb-2">
+          <div class="col-md-8">
+            <!-- template reference variables are scoped to the template they are defined in.
+                    https://stackoverflow.com/questions/44440879/dynamic-template-reference-variable-inside-ngfor-angular-9
+                 -->
+            <input
+              #personControl="ngModel"
+              [ngClass]="personControl.invalid ? 'invalid' : 'valid'"
+              class="form-control"
+              id="firstNameId-{{ i }}"
+              type="text"
+              placeholder="First Name (required)"
+              name="person-{{ i }}"
+              appNullOnHide
+              [(ngModel)]="viewModel.people[i]"
+            />
+            <span *ngIf="invalid">
+              Please enter your first name.
+            </span>
+          </div>
+        </div>
+      </fieldset>
+      <app-form-control-wrapper [label]="'Type of business'">
+        <button
+          class="btn btn-primary mr-3"
+          type="submit"
+          style="width:80px"
+          [title]="
+            customerForm.valid
+              ? 'Save your entered data'
+              : 'Disabled until the form data is valid'
+          "
+          [disabled]="!customerForm.valid"
+        >
+          Save
+        </button>
+      </app-form-control-wrapper>
+    </form>
+  </div>
+</div>
+<strong>view model:</strong>
+<pre>{{ viewModel | json }}</pre>
+<strong>form value:</strong>
+<pre>{{ customerForm.value | json }}</pre>
+<br />Dirty: {{ customerForm.dirty }} <br />Touched: {{ customerForm.touched }}
+<br />Valid: {{ customerForm.valid }} <br />Value:
+{{ customerForm.value | json }} <br />&nbsp;
